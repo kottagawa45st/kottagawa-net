@@ -1,0 +1,107 @@
+/* -----------------------------------------------
+   90s Retro Template for Kottagawa Studio
+----------------------------------------------- */
+body {
+  background-color: #008080;
+  font-family: "ＭＳ Ｐゴシック", "MS PGothic", "Mona", "mona-sans", "IPAMonaPGothic", sans-serif;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+  margin: 0;
+  color: #333333;
+}
+a { color: #0000cc; }
+a:visited { color: #800080; }
+a:hover { color: #ff0000; }
+
+#site-box {
+  background-color: #ffffff;
+  border: 3px double #000000;
+  box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+body.is-home #site-box { max-width: 800px; text-align: center; }
+body.is-not-home #site-box { max-width: 900px; text-align: left; }
+
+.logo-top { max-width: 100%; height: auto; margin-bottom: 20px;}
+.logo-page { max-width: 250px; height: auto; border: none; }
+.page-logo-area { border-bottom: 1px solid #808080; margin-bottom: 20px; padding-bottom: 10px; }
+
+.counter-container {
+  margin: 25px auto; display: inline-flex; align-items: center;
+  background-color: #333; padding: 5px; border: 3px inset #808080;
+}
+.counter-title { color: #00ff00; margin-right: 8px; font-size: 16px;}
+.flip-digits { display: flex; gap: 2px; }
+.digit {
+  background-color: #111; color: #fff; font-family: "Courier New", monospace;
+  font-weight: bold; padding: 4px 8px; border: 1px solid #000; border-radius: 2px;
+  box-shadow: inset 0px 0px 4px rgba(255, 255, 255, 0.2); position: relative; font-size: 18px;
+}
+.digit::after {
+  content: ""; position: absolute; top: 50%; left: 0; width: 100%; height: 1px;
+  background-color: #000; box-shadow: 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.catch-copy { line-height: 1.8; white-space: nowrap; font-size: 18px; margin: 35px 0 45px 0;}
+
+.button-group-top {
+  display: flex; flex-direction: column; gap: 12px;
+  border-bottom: 1px dashed #808080; padding-bottom: 40px; margin-bottom: 50px;
+}
+.btn-row { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+.btn-top {
+  background-color: #c0c0c0; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff;
+  color: #000000; text-decoration: none; display: inline-block; text-align: center;
+  width: 140px; font-size: 15px; padding: 10px 0;
+}
+.btn-top:active { border-color: #808080 #ffffff #ffffff #808080; }
+
+.content-wrapper { display: flex; align-items: flex-start; }
+.left-content { flex: 1; box-sizing: border-box; }
+body.is-not-home .left-content { border-right: 2px groove #c0c0c0; padding-right: 30px;}
+
+.right-sidebar { width: 180px; box-sizing: border-box; position: sticky; top: 20px; padding-left: 20px;}
+.button-group-side { display: flex; flex-direction: column; gap: 12px; }
+.btn-side {
+  background-color: #c0c0c0; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff;
+  color: #000000; text-decoration: none; display: block; text-align: center; padding: 8px 0; font-size: 15px;
+}
+.btn-side:active { border-color: #808080 #ffffff #ffffff #808080; }
+
+.post { border: 1px solid #808080; background-color: #fcfcfc; margin-bottom: 25px; padding: 20px; text-align: left; }
+.post-title { font-weight: bold; color: #0000cc; border-bottom: 1px solid #c0c0c0; font-size: 20px; margin: 0 0 10px 0; padding-bottom: 5px; }
+.post-date { color: #666666; font-size: 14px; margin-bottom: 15px; }
+.post-body { line-height: 1.8; word-break: break-all; font-size: 15px; color: #333333; }
+
+.direct-page-content { padding: 10px; font-size: 16px; line-height: 2.0; text-align: center; }
+.direct-page-title { font-size: 20px; font-weight: bold; margin-bottom: 30px; text-align: left; border-bottom: 1px dashed #c0c0c0; padding-bottom: 5px; }
+
+.site-footer { margin-top: 30px; padding-top: 10px; border-top: 1px dotted #808080; text-align: right; font-size: 11px; color: #666666; font-family: "Courier New", monospace; }
+
+@media screen and (min-width: 501px) {
+  body.is-home #site-box { padding: 50px 30px 20px 30px; }
+  body.is-not-home #site-box { padding: 30px 30px 20px 30px; }
+  body { padding: 40px 20px; }
+}
+
+@media screen and (max-width: 500px) {
+  body { padding: 10px 5px; }
+  body.is-home #site-box { padding: 20px 5px 15px 5px; }
+  body.is-not-home #site-box { padding: 15px 10px 15px 10px; }
+  .content-wrapper { flex-direction: column; }
+  body.is-not-home .left-content { border-right: none; border-bottom: 2px groove #c0c0c0; padding-right: 0; padding-bottom: 20px; margin-bottom: 20px; width: 100%; }
+  .right-sidebar { width: 100%; padding-left: 0; position: static; }
+  .button-group-side { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .btn-side { width: 30%; font-size: 3.2vw; }
+  .counter-title { font-size: 3.2vw; margin-right: 4px; }
+  .digit { font-size: 3.5vw; padding: 2px 4px; }
+  .catch-copy { font-size: 3.6vw; margin: 20px 0 30px 0; }
+  .button-group-top { gap: 10px; margin-bottom: 30px; padding-bottom: 25px; }
+  .btn-row { gap: 8px; }
+  .btn-top { width: 28%; font-size: 3vw; padding: 8px 0; }
+  .logo-page { max-width: 200px; }
+  .post { padding: 15px; margin-bottom: 20px; }
+  .post-title { font-size: 16px; margin: 0 0 8px 0; padding-bottom: 4px; }
+}

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5">
+<title>乞田川四畳半スタジオ 4.5st</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="is-home">
+  <div id="site-box">
+    <div class="home-header-area">
+      <a href="index.html">
+        <img alt="乞田川四畳半スタジオ 4.5st" class="logo-top" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiOvkliitE6fxe-2iiXP3PQWNdfYAWMrbM_MSNJJqNSeEdz0s9QS6jZ7xUxeqv2O5C5ufAI_CQCm5A0HFr27qvehOyDKhcd4bwIDwkJthbQWDK-5aY6O5Yn8rhMyWQ_BqBKs7qk7xjMX7LIabCeC6Es65ArY11gJKpenolF5hOqdPdRGyU87bg4MhGuKw35/s1600/logo.PNG">
+      </a><br>
+      <div class="counter-container">
+        <span class="counter-title">アクセスカウンタ</span>
+        <div class="flip-digits" id="retro-counter">
+          <span class="digit">0</span><span class="digit">0</span><span class="digit">0</span><span class="digit">0</span>
+          <span class="digit">0</span><span class="digit">0</span><span class="digit">0</span><span class="digit">0</span>
+        </div>
+      </div>
+      <div class="catch-copy">
+        乞田川流域に存在する、たった四畳半の小さなスタジオ<br>
+        観えないモノを凝視して、そっと耳を傾けて…
+      </div>
+      <div class="button-group-top">
+        <div class="btn-row">
+          <a class="btn-top" href="about.html">概 要</a>
+          <a class="btn-top" href="staff.html">所属職員</a>
+          <a class="btn-top" href="index.html">制作ブログ</a>
+        </div>
+        <div class="btn-row">
+          <a class="btn-top" href="live.html">出演情報</a>
+          <a class="btn-top" href="goods.html">グッズ・物販</a>
+          <a class="btn-top" href="mailto:enquiries@kottagawa.net">お問い合わせ</a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- ブログ記事一覧エリア -->
+    <div class="blog-posts">
+      <!-- 記事1 -->
+      <div class="post">
+        <h2 class="post-title">Webサイトを移転・リニューアルしました</h2>
+        <div class="post-date">投稿日時: 2026年9月28日</div>
+        <div class="post-body">
+          こちらで制作ブログなどを更新していきます。<br>
+          よろしくお願いいたします。
+        </div>
+      </div>
+      <!-- 記事を追加するときは、この <div class="post">...</div> をコピーして上に増やします -->
+    </div>
+
+    <div class="site-footer">Since Reiwa-5th</div>
+  </div>
+
+  <script>
+    const DIGIT_COUNT = 8;
+    const counterKey = "kottagawa_studio_official_pv_v1";
+    function runFlipAnimation(targetNumber) {
+      const counterDiv = document.getElementById("retro-counter");
+      if (!counterDiv) return;
+      const targetStr = Math.min(targetNumber, Math.pow(10, DIGIT_COUNT) - 1).toString().padStart(DIGIT_COUNT, '0');
+      const spans = counterDiv.getElementsByClassName("digit");
+      const fixed = new Array(DIGIT_COUNT).fill(false);
+      for(let i = 0; i < DIGIT_COUNT; i++) {
+        setTimeout(() => { fixed[i] = true; spans[i].innerText = targetStr[i]; }, 500 + (i * 500));
+      }
+      const interval = setInterval(() => {
+        let allFixed = true;
+        for (let i = 0; i < DIGIT_COUNT; i++) {
+          if (!fixed[i]) {
+            allFixed = false;
+            let currentNum = parseInt(spans[i].innerText || 0, 10);
+            spans[i].innerText = (currentNum + 1) % 10;
+          }
+        }
+        if (allFixed) clearInterval(interval);
+      }, 80);
+    }
+    const apiUrl = "https://countapi.mileshilliard.com/api/v1/hit/" + counterKey;
+    fetch(apiUrl).then(r => r.json()).then(data => {
+      let val = parseInt(data.value, 10) || 1; setTimeout(() => runFlipAnimation(val), 1000);
+    }).catch(e => {
+      let localCount = parseInt(localStorage.getItem(counterKey) || "0", 10) + 1;
+      localStorage.setItem(counterKey, localCount); setTimeout(() => runFlipAnimation(localCount), 1000);
+    });
+  </script>
+</body>
+</html>

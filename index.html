@@ -38,23 +38,15 @@
     </div>
     
     <!-- ブログ記事一覧エリア -->
-    <div class="blog-posts">
-      <!-- 記事1 -->
-      <div class="post">
-        <h2 class="post-title">Webサイトを移転・リニューアルしました</h2>
-        <div class="post-date">投稿日時: 2026年9月28日</div>
-        <div class="post-body">
-          こちらで制作ブログなどを更新していきます。<br>
-          よろしくお願いいたします。
-        </div>
-      </div>
-      <!-- 記事を追加するときは、この <div class="post">...</div> をコピーして上に増やします -->
+    <div class="blog-posts" id="blog-container">
+      <p style="text-align:center; font-size:14px; color:#666;">データを読み込み中...</p>
     </div>
 
     <div class="site-footer">Since Reiwa-5th</div>
   </div>
 
   <script>
+    // ▼ アクセスカウンター
     const DIGIT_COUNT = 8;
     const counterKey = "kottagawa_studio_official_pv_v1";
     function runFlipAnimation(targetNumber) {
@@ -85,6 +77,44 @@
       let localCount = parseInt(localStorage.getItem(counterKey) || "0", 10) + 1;
       localStorage.setItem(counterKey, localCount); setTimeout(() => runFlipAnimation(localCount), 1000);
     });
+
+    // ▼ スプレッドシート（ブログ用）読み込み
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQzTzlj5WZKy0q1KtfLNFPG4pZLBS8FoQu9mBvAOIz0xqiIs4Cc8jkTyVcGD5-YluStfFoJ0Yh6GM3q/pub?gid=0&single=true&output=csv';
+    
+    fetch(csvUrl)
+      .then(response => response.text())
+      .then(csvText => {
+        const rows = csvText.split('\n');
+        const container = document.getElementById('blog-container');
+        container.innerHTML = ''; // 読込中の文字を消す
+
+        // 1行目（見出し）を飛ばして下からループ（最新記事を上に）
+        for (let i = rows.length - 1; i >= 1; i--) {
+          const row = rows[i];
+          if (!row.trim()) continue; // 空行スキップ
+          
+          // CSVのカンマ分割（正規表現で安全に分割）
+          const columns = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+          if (columns.length < 3) continue;
+
+          const dateStr = columns[0].replace(/^"|"$/g, '').trim();
+          const titleStr = columns[1].replace(/^"|"$/g, '').trim();
+          let bodyStr = columns[2].replace(/^"|"$/g, '').trim();
+          
+          // HTMLの生成
+          const postDiv = document.createElement('div');
+          postDiv.className = 'post';
+          postDiv.innerHTML = `
+            <h2 class="post-title">${titleStr}</h2>
+            <div class="post-date">投稿日時: ${dateStr}</div>
+            <div class="post-body">${bodyStr}</div>
+          `;
+          container.appendChild(postDiv);
+        }
+      })
+      .catch(error => {
+        document.getElementById('blog-container').innerHTML = '<p style="text-align:center;">記事の読み込みに失敗しました。</p>';
+      });
   </script>
 </body>
 </html>

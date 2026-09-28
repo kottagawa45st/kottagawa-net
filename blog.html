@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5">
+<title>制作ブログ - 乞田川四畳半スタジオ 4.5st</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="is-not-home">
+  <div id="site-box">
+    <div class="content-wrapper">
+      <div class="left-content">
+        <div class="page-logo-area">
+          <a href="index.html">
+            <img alt="乞田川四畳半スタジオ 4.5st" class="logo-page" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiOvkliitE6fxe-2iiXP3PQWNdfYAWMrbM_MSNJJqNSeEdz0s9QS6jZ7xUxeqv2O5C5ufAI_CQCm5A0HFr27qvehOyDKhcd4bwIDwkJthbQWDK-5aY6O5Yn8rhMyWQ_BqBKs7qk7xjMX7LIabCeC6Es65ArY11gJKpenolF5hOqdPdRGyU87bg4MhGuKw35/s1600/logo.PNG">
+          </a>
+        </div>
+
+        <div class="direct-page-title">制作ブログ</div>
+        
+        <!-- ブログ記事が読み込まれる場所 -->
+        <div class="blog-posts" id="blog-container">
+          <p style="text-align:center; font-size:14px; color:#666;">データを読み込み中...</p>
+        </div>
+
+      </div>
+
+      <!-- 右側メニュー -->
+      <div class="right-sidebar">
+        <div class="button-group-side">
+          <a class="btn-side" href="about.html">概 要</a>
+          <a class="btn-side" href="staff.html">所属職員</a>
+          <a class="btn-side" href="blog.html">制作ブログ</a>
+          <a class="btn-side" href="live.html">出演情報</a>
+          <a class="btn-side" href="goods.html">グッズ・物販</a>
+          <a class="btn-side" href="mailto:enquiries@kottagawa.net">お問い合わせ</a>
+        </div>
+      </div>
+    </div>
+    <div class="site-footer">Since Reiwa-5th</div>
+  </div>
+
+  <script>
+    // スプレッドシート（ブログ用）読み込み
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQzTzlj5WZKy0q1KtfLNFPG4pZLBS8FoQu9mBvAOIz0xqiIs4Cc8jkTyVcGD5-YluStfFoJ0Yh6GM3q/pub?gid=0&single=true&output=csv';
+    
+    fetch(csvUrl)
+      .then(response => response.text())
+      .then(csvText => {
+        const rows = csvText.split('\n');
+        const container = document.getElementById('blog-container');
+        container.innerHTML = ''; 
+
+        for (let i = rows.length - 1; i >= 1; i--) {
+          const row = rows[i];
+          if (!row.trim()) continue;
+          
+          const columns = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+          if (columns.length < 3) continue;
+
+          const dateStr = columns[0].replace(/^"|"$/g, '').trim();
+          const titleStr = columns[1].replace(/^"|"$/g, '').trim();
+          let bodyStr = columns[2].replace(/^"|"$/g, '').trim();
+          
+          const postDiv = document.createElement('div');
+          postDiv.className = 'post';
+          postDiv.innerHTML = `
+            <h2 class="post-title">${titleStr}</h2>
+            <div class="post-date">投稿日時: ${dateStr}</div>
+            <div class="post-body">${bodyStr}</div>
+          `;
+          container.appendChild(postDiv);
+        }
+      })
+      .catch(error => {
+        document.getElementById('blog-container').innerHTML = '<p style="text-align:center;">記事の読み込みに失敗しました。</p>';
+      });
+  </script>
+</body>
+</html>

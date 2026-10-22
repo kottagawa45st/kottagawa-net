@@ -24,8 +24,21 @@ a:hover { color: #ff0000; }
 body.is-home #site-box { max-width: 800px; text-align: center; }
 body.is-not-home #site-box { max-width: 900px; text-align: left; }
 
-.logo-top { max-width: 100%; height: auto; margin-bottom: 20px;}
-.logo-page { max-width: 250px; height: auto; border: none; }
+/* ▼ ロゴ設定（レトロフィルター追加） */
+.logo-top {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+  image-rendering: pixelated;
+  filter: drop-shadow(2px 2px 0px #000000);
+}
+.logo-page {
+  max-width: 250px;
+  height: auto;
+  border: none;
+  image-rendering: pixelated;
+  filter: drop-shadow(2px 2px 0px #000000);
+}
 .page-logo-area { border-bottom: 1px solid #808080; margin-bottom: 20px; padding-bottom: 10px; }
 
 .counter-container {
@@ -78,7 +91,8 @@ body.is-not-home .left-content { border-right: 2px groove #c0c0c0; padding-right
 .direct-page-content { padding: 10px; font-size: 16px; line-height: 2.0; text-align: center; }
 .direct-page-title { font-size: 20px; font-weight: bold; margin-bottom: 30px; text-align: left; border-bottom: 1px dashed #c0c0c0; padding-bottom: 5px; }
 
-.site-footer { margin-top: 30px; padding-top: 10px; border-top: 1px dotted #808080; text-align: right; font-size: 11px; color: #666666; font-family: "Courier New", monospace; }
+/* ▼ フッター設定 */
+.site-footer { margin-top: 30px; padding-top: 15px; border-top: 1px dotted #808080; text-align: right; font-size: 17px; color: #666666; font-family: "Courier New", monospace; }
 
 @media screen and (min-width: 501px) {
   body.is-home #site-box { padding: 50px 30px 20px 30px; }

@@ -22,7 +22,7 @@
     font-weight: bold;
     font-size: 14px;
     margin-bottom: 6px;
-    color: #000080; /* レトロな紺色 */
+    color: #000080;
   }
   .required-badge {
     color: #ff0000;
@@ -87,10 +87,9 @@
           必要事項をご記入の上、「送信」ボタンを押してください。
         </p>
 
-        <!-- メール送信フォーム -->
-        <form class="contact-form" action="https://formsubmit.co/enquiries@kottagawa.net" method="POST">
+        <!-- メール送信フォーム（認証済み専用ID指定） -->
+        <form class="contact-form" action="https://formsubmit.co/d2669334f1fbb6cd208e1ed9dad279d4" method="POST">
           
-          <!-- スパム防止・転送後設定 -->
           <input type="text" name="_honey" style="display:none">
           <input type="hidden" name="_template" value="table">
           <input type="hidden" name="_captcha" value="false">
@@ -105,42 +104,3 @@
           <div class="form-group">
             <label class="form-label" for="email">メールアドレス<span class="required-badge">*必須</span></label>
             <input class="form-input" type="email" id="email" name="email" required placeholder="name@example.com">
-          </div>
-
-          <!-- 件名 -->
-          <div class="form-group">
-            <label class="form-label" for="subject">件名<span class="required-badge">*必須</span></label>
-            <input class="form-input" type="text" id="subject" name="_subject" required placeholder="例：出演依頼について">
-          </div>
-
-          <!-- 本文 -->
-          <div class="form-group">
-            <label class="form-label" for="message">お問い合わせ内容<span class="required-badge">*必須</span></label>
-            <textarea class="form-textarea" id="message" name="本文" required placeholder="お問い合わせ内容をご入力ください"></textarea>
-          </div>
-
-          <!-- 送信ボタン -->
-          <div class="form-actions">
-            <button class="btn-submit" type="submit">送　信</button>
-            <button class="btn-reset" type="reset">リセット</button>
-          </div>
-        </form>
-
-      </div>
-
-      <!-- 右側メニュー -->
-      <div class="right-sidebar">
-        <div class="button-group-side">
-          <a class="btn-side" href="about.html">概 要</a>
-          <a class="btn-side" href="staff.html">所属職員</a>
-          <a class="btn-side" href="blog.html">制作ブログ</a>
-          <a class="btn-side" href="live.html">出演情報</a>
-          <a class="btn-side" href="goods.html">グッズ・物販</a>
-          <a class="btn-side" href="contact.html">お問い合わせ</a>
-        </div>
-      </div>
-    </div>
-    <div class="site-footer">Since Reiwa-5th</div>
-  </div>
-</body>
-</html>

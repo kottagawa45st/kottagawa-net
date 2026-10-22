@@ -87,18 +87,17 @@
           必要事項をご記入の上、「送信」ボタンを押してください。
         </p>
 
-        <!-- メール送信フォーム（認証済み専用ID指定） -->
-        <form class="contact-form" action="https://formsubmit.co/enquiries@kottagawa.net" method="POST">
+        <!-- 画面遷移させずに送信結果を判定する見えないフレーム -->
+        <script>var submitted = false;</script>
+        <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){alert('お問い合わせを送信いたしました。\\n確認次第ご連絡いたします。'); document.getElementById('contact-form').reset(); submitted=false;}"></iframe>
 
+        <!-- Google Apps Script 連携フォーム -->
+        <form class="contact-form" id="contact-form" action="https://script.google.com/macros/s/AKfycbylkZARfp8JikVL7I5wrQdkTND5_bIjYt5D6a_Fk1BAq-IhwNn7_PkO2SJVrzj3ym2-/exec" method="POST" target="hidden_iframe" onsubmit="submitted=true;">
           
-          <input type="text" name="_honey" style="display:none">
-          <input type="hidden" name="_template" value="table">
-          <input type="hidden" name="_captcha" value="false">
-
-          <!-- お名前（任意） -->
+          <!-- お名前 -->
           <div class="form-group">
             <label class="form-label" for="name">お名前 / 貴社名</label>
-            <input class="form-input" type="text" id="name" name="お名前" placeholder="例：四畳半 太郎">
+            <input class="form-input" type="text" id="name" name="name" placeholder="例：四畳半 太郎">
           </div>
 
           <!-- 返信用メールアドレス -->
@@ -109,14 +108,14 @@
 
           <!-- 件名 -->
           <div class="form-group">
-            <label class="form-label" for="subject">件名<span class="required-badge">*必須</span></label>
-            <input class="form-input" type="text" id="subject" name="_subject" required placeholder="例：出演依頼について">
+            <label class="form-label" for="subject">用件<span class="required-badge">*必須</span></label>
+            <input class="form-input" type="text" id="subject" name="subject" required placeholder="例：出演依頼について">
           </div>
 
           <!-- 本文 -->
           <div class="form-group">
             <label class="form-label" for="message">お問い合わせ内容<span class="required-badge">*必須</span></label>
-            <textarea class="form-textarea" id="message" name="本文" required placeholder="お問い合わせ内容をご入力ください"></textarea>
+            <textarea class="form-textarea" id="message" name="message" required placeholder="お問い合わせ内容をご入力ください"></textarea>
           </div>
 
           <!-- 送信ボタン -->

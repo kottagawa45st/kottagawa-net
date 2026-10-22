@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="style.css">
 <style>
   /* 90年代レトロフォーム専用装飾 */
-  .contact-form {
+  .contact-box {
     background-color: #f0f0f0;
     border: 2px groove #ffffff;
     padding: 20px;
@@ -53,8 +53,9 @@
     display: flex;
     justify-content: center;
     gap: 15px;
+    flex-wrap: wrap;
   }
-  .btn-submit, .btn-reset {
+  .btn-retro {
     background-color: #c0c0c0;
     border: 2px solid;
     border-color: #ffffff #808080 #808080 #ffffff;
@@ -62,12 +63,49 @@
     font-family: inherit;
     font-size: 14px;
     font-weight: bold;
-    padding: 8px 25px;
+    padding: 8px 24px;
     cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
   }
-  .btn-submit:active, .btn-reset:active {
+  .btn-retro:active {
     border-color: #808080 #ffffff #ffffff #808080;
   }
+
+  /* 確認画面テーブル */
+  .confirm-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    border: 2px inset #808080;
+    font-size: 14px;
+    margin-top: 10px;
+  }
+  .confirm-table th {
+    background-color: #e4e4e4;
+    border: 1px solid #808080;
+    padding: 8px 10px;
+    text-align: left;
+    width: 30%;
+    color: #000080;
+    vertical-align: top;
+  }
+  .confirm-table td {
+    border: 1px solid #808080;
+    padding: 8px 10px;
+    word-break: break-all;
+    line-height: 1.6;
+  }
+
+  /* 結果表示ボックス */
+  .result-box {
+    text-align: center;
+    padding: 20px 10px;
+    line-height: 1.8;
+    font-size: 15px;
+  }
+  .result-success { color: #000080; font-weight: bold; }
+  .result-error { color: #cc0000; font-weight: bold; }
 </style>
 </head>
 <body class="is-not-home">
@@ -82,48 +120,102 @@
 
         <div class="direct-page-title">お問い合わせ</div>
         
-        <p style="font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
-          出演依頼、楽曲制作、取材等の各種お問い合わせは下記フォームより承っております。<br>
-          必要事項をご記入の上、「送信」ボタンを押してください。
-        </p>
+        <!-- ================= ① 入力ステップ ================= -->
+        <div id="step-input">
+          <p style="font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
+            出演依頼、楽曲制作、取材等の各種お問い合わせは下記フォームより承っております。<br>
+            必要事項をご記入の上、「確認画面へ」ボタンを押してください。
+          </p>
 
-        <!-- 画面遷移させずに送信結果を判定する見えないフレーム -->
-        <script>var submitted = false;</script>
-        <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted){alert('お問い合わせを送信いたしました。\\n確認次第ご連絡いたします。'); document.getElementById('contact-form').reset(); submitted=false;}"></iframe>
+          <form class="contact-box" id="contact-form" onsubmit="event.preventDefault(); goToConfirm();">
+            <div class="form-group">
+              <label class="form-label" for="in-name">お名前 / 貴社名</label>
+              <input class="form-input" type="text" id="in-name" placeholder="例：四畳半 太郎">
+            </div>
 
-        <!-- Google Apps Script 連携フォーム -->
-        <form class="contact-form" id="contact-form" action="https://script.google.com/macros/s/AKfycbylkZARfp8JikVL7I5wrQdkTND5_bIjYt5D6a_Fk1BAq-IhwNn7_PkO2SJVrzj3ym2-/exec" method="POST" target="hidden_iframe" onsubmit="submitted=true;">
-          
-          <!-- お名前 -->
-          <div class="form-group">
-            <label class="form-label" for="name">お名前 / 貴社名</label>
-            <input class="form-input" type="text" id="name" name="name" placeholder="例：四畳半 太郎">
+            <div class="form-group">
+              <label class="form-label" for="in-email">メールアドレス<span class="required-badge">*必須</span></label>
+              <input class="form-input" type="email" id="in-email" required placeholder="name@example.com">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="in-subject">用件<span class="required-badge">*必須</span></label>
+              <input class="form-input" type="text" id="in-subject" required placeholder="例：出演依頼について">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="in-message">お問い合わせ内容<span class="required-badge">*必須</span></label>
+              <textarea class="form-textarea" id="in-message" required placeholder="お問い合わせ内容をご入力ください"></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn-retro" type="submit">確認画面へ</button>
+              <button class="btn-retro" type="reset">リセット</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- ================= ② 確認ステップ ================= -->
+        <div id="step-confirm" style="display: none;">
+          <p style="font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
+            以下の内容で送信します。内容をご確認の上、「送信する」ボタンを押してください。
+          </p>
+
+          <div class="contact-box">
+            <table class="confirm-table">
+              <tr>
+                <th>お名前 / 貴社名</th>
+                <td id="cf-name"></td>
+              </tr>
+              <tr>
+                <th>メールアドレス</th>
+                <td id="cf-email"></td>
+              </tr>
+              <tr>
+                <th>用件</th>
+                <td id="cf-subject"></td>
+              </tr>
+              <tr>
+                <th>お問い合わせ内容</th>
+                <td id="cf-message"></td>
+              </tr>
+            </table>
+
+            <div class="form-actions">
+              <button class="btn-retro" type="button" onclick="backToInput();">≪ 修正する</button>
+              <button class="btn-retro" type="button" id="btn-send" onclick="sendForm();">送 信 す る</button>
+            </div>
           </div>
+        </div>
 
-          <!-- 返信用メールアドレス -->
-          <div class="form-group">
-            <label class="form-label" for="email">メールアドレス<span class="required-badge">*必須</span></label>
-            <input class="form-input" type="email" id="email" name="email" required placeholder="name@example.com">
+        <!-- ================= ③ 送信完了ステップ ================= -->
+        <div id="step-success" style="display: none;">
+          <div class="contact-box result-box">
+            <div class="result-success">正常に送信されました。</div>
+            <p style="margin: 15px 0;">
+              お問い合わせいただき誠にありがとうございます。<br>
+              内容を確認次第、担当者よりご連絡を差し上げます。
+            </p>
+            <div class="form-actions" style="margin-top: 20px;">
+              <a class="btn-retro" href="index.html">トップページへ戻る</a>
+            </div>
           </div>
+        </div>
 
-          <!-- 件名 -->
-          <div class="form-group">
-            <label class="form-label" for="subject">用件<span class="required-badge">*必須</span></label>
-            <input class="form-input" type="text" id="subject" name="subject" required placeholder="例：出演依頼について">
+        <!-- ================= ④ エラーステップ ================= -->
+        <div id="step-error" style="display: none;">
+          <div class="contact-box result-box">
+            <div class="result-error">送信中にエラーが発生しました。</div>
+            <p style="margin: 15px 0;">
+              申し訳ございません。通信環境をご確認の上、再度お試しいただくか、<br>
+              直接 <a href="mailto:enquiries@kottagawa.net">enquiries@kottagawa.net</a> までご連絡ください。
+            </p>
+            <div class="form-actions" style="margin-top: 20px;">
+              <button class="btn-retro" type="button" onclick="backToConfirm();">もう一度試す</button>
+              <button class="btn-retro" type="button" onclick="backToInput();">入力画面へ戻る</button>
+            </div>
           </div>
-
-          <!-- 本文 -->
-          <div class="form-group">
-            <label class="form-label" for="message">お問い合わせ内容<span class="required-badge">*必須</span></label>
-            <textarea class="form-textarea" id="message" name="message" required placeholder="お問い合わせ内容をご入力ください"></textarea>
-          </div>
-
-          <!-- 送信ボタン -->
-          <div class="form-actions">
-            <button class="btn-submit" type="submit">送　信</button>
-            <button class="btn-reset" type="reset">リセット</button>
-          </div>
-        </form>
+        </div>
 
       </div>
 
@@ -141,5 +233,82 @@
     </div>
     <div class="site-footer">Since Reiwa-5th</div>
   </div>
+
+  <script>
+    // ★発行されたGoogle Apps ScriptのウェブアプリURLを貼り付けてください
+    const gasUrl = "https://script.google.com/macros/s/AKfycbylkZARfp8JikVL7I5wrQdkTND5_bIjYt5D6a_Fk1BAq-IhwNn7_PkO2SJVrzj3ym2-/exec";
+
+    // 画面切り替え関数
+    function showStep(stepId) {
+      document.getElementById('step-input').style.display = 'none';
+      document.getElementById('step-confirm').style.display = 'none';
+      document.getElementById('step-success').style.display = 'none';
+      document.getElementById('step-error').style.display = 'none';
+      document.getElementById(stepId).style.display = 'block';
+      window.scrollTo(0, 0);
+    }
+
+    // ① 確認画面へ進む処理
+    function goToConfirm() {
+      const name = document.getElementById('in-name').value.trim() || '（未入力）';
+      const email = document.getElementById('in-email').value.trim();
+      const subject = document.getElementById('in-subject').value.trim();
+      const message = document.getElementById('in-message').value.trim();
+
+      document.getElementById('cf-name').textContent = name;
+      document.getElementById('cf-email').textContent = email;
+      document.getElementById('cf-subject').textContent = subject;
+      
+      // 改行を保持して確認表示
+      document.getElementById('cf-message').innerHTML = message.replace(/\n/g, '<br>');
+
+      showStep('step-confirm');
+    }
+
+    // ② 入力画面へ戻る（入力値はそのまま維持）
+    function backToInput() {
+      showStep('step-input');
+    }
+
+    function backToConfirm() {
+      showStep('step-confirm');
+    }
+
+    // ③ GASへ送信処理
+    function sendForm() {
+      const btn = document.getElementById('btn-send');
+      btn.disabled = true;
+      btn.textContent = '送信中...';
+
+      const name = document.getElementById('in-name').value.trim();
+      const email = document.getElementById('in-email').value.trim();
+      const subject = document.getElementById('in-subject').value.trim();
+      const message = document.getElementById('in-message').value.trim();
+
+      const params = new URLSearchParams();
+      params.append('name', name);
+      params.append('email', email);
+      params.append('subject', subject);
+      params.append('message', message);
+
+      fetch(gasUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params.toString(),
+        mode: 'no-cors'
+      })
+      .then(() => {
+        btn.disabled = false;
+        btn.textContent = '送 信 す る';
+        document.getElementById('contact-form').reset();
+        showStep('step-success');
+      })
+      .catch((err) => {
+        btn.disabled = false;
+        btn.textContent = '送 信 す る';
+        showStep('step-error');
+      });
+    }
+  </script>
 </body>
 </html>

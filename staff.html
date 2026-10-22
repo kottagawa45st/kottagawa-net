@@ -55,15 +55,6 @@
         container.innerHTML = '';
         const data = results.data;
 
-        // 新しい記事を上に表示（逆順ループ）
-        for (let i = data.length - 1; i >= 0; i--) {
-          const row = data[i];
-          const dateStr = row.date || '';
-          const titleStr = row.title || '';
-          let bodyStr = row.body || '';
-
-          if (!titleStr && !bodyStr) continue;
-
           // ① セル内のEnter改行を自動で画面の改行に変換
           bodyStr = bodyStr.replace(/\r\n|\n|\r/g, '<br>');
 

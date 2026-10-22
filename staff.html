@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5">
-<!-- ★ページタイトル -->
 <title>所属職員紹介 - 乞田川四畳半スタジオ 4.5st</title>
 <link rel="stylesheet" href="style.css">
 <!-- セル内改行を正しく読み取るための軽量ツール -->
@@ -19,7 +18,6 @@
           </a>
         </div>
 
-        <!-- ★画面上の見出し -->
         <div class="direct-page-title">所属職員紹介</div>
         
         <div class="blog-posts" id="data-container">
@@ -43,7 +41,6 @@
   </div>
 
   <script>
-    // ★スプレッドシートのCSV URL
     const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQzTzlj5WZKy0q1KtfLNFPG4pZLBS8FoQu9mBvAOIz0xqiIs4Cc8jkTyVcGD5-YluStfFoJ0Yh6GM3q/pub?gid=2069646322&single=true&output=csv';
 
     Papa.parse(csvUrl, {
@@ -55,17 +52,25 @@
         container.innerHTML = '';
         const data = results.data;
 
-          // ① セル内のEnter改行を自動で画面の改行に変換
+        // 加入順（スプレッドシートの上から順）にループ処理
+        for (let i = 0; i < data.length; i++) {
+          const row = data[i];
+          const titleStr = row.title || '';
+          let bodyStr = row.body || '';
+
+          if (!titleStr && !bodyStr) continue;
+
+          // セル内のEnter改行を自動で画面の改行に変換
           bodyStr = bodyStr.replace(/\r\n|\n|\r/g, '<br>');
 
-          // ② [img:画像名] をレトロ枠付き画像に自動変換
+          // [img:画像名] をレトロ枠付き画像に自動変換
           bodyStr = bodyStr.replace(/\[img:(.+?)\]/g, '<div style="margin: 15px 0; text-align: center;"><img src="$1" style="max-width: 100%; height: auto; border: 1px solid #808080;"></div>');
 
+          // HTMLを生成（投稿日時の行は除外）
           const postDiv = document.createElement('div');
           postDiv.className = 'post';
           postDiv.innerHTML = `
             <h2 class="post-title">${titleStr}</h2>
-            <div class="post-date">投稿日時: ${dateStr}</div>
             <div class="post-body">${bodyStr}</div>
           `;
           container.appendChild(postDiv);

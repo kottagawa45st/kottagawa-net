@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5">
+<!-- ★ページタイトル -->
+<title>出演情報 - 乞田川四畳半スタジオ 4.5st</title>
+<link rel="stylesheet" href="style.css">
+<!-- セル内改行を正しく読み取るための軽量ツール -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+</head>
+<body class="is-not-home">
+  <div id="site-box">
+    <div class="content-wrapper">
+      <div class="left-content">
+        <div class="page-logo-area">
+          <a href="index.html">
+            <img alt="乞田川四畳半スタジオ 4.5st" class="logo-page" src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiOvkliitE6fxe-2iiXP3PQWNdfYAWMrbM_MSNJJqNSeEdz0s9QS6jZ7xUxeqv2O5C5ufAI_CQCm5A0HFr27qvehOyDKhcd4bwIDwkJthbQWDK-5aY6O5Yn8rhMyWQ_BqBKs7qk7xjMX7LIabCeC6Es65ArY11gJKpenolF5hOqdPdRGyU87bg4MhGuKw35/s1600/logo.PNG">
+          </a>
+        </div>
+
+        <!-- ★画面上の見出し -->
+        <div class="direct-page-title">出演情報</div>
+        
+        <div class="blog-posts" id="data-container">
+          <p style="text-align:center; font-size:14px; color:#666;">データを読み込み中...</p>
+        </div>
+      </div>
+
+      <!-- 右側メニュー -->
+      <div class="right-sidebar">
+        <div class="button-group-side">
+          <a class="btn-side" href="about.html">概 要</a>
+          <a class="btn-side" href="staff.html">所属職員</a>
+          <a class="btn-side" href="blog.html">制作ブログ</a>
+          <a class="btn-side" href="live.html">出演情報</a>
+          <a class="btn-side" href="goods.html">グッズ・物販</a>
+          <a class="btn-side" href="mailto:enquiries@kottagawa.net">お問い合わせ</a>
+        </div>
+      </div>
+    </div>
+    <div class="site-footer">Since Reiwa-5th</div>
+  </div>
+
+  <script>
+    // ★スプレッドシートのCSV URL
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQzTzlj5WZKy0q1KtfLNFPG4pZLBS8FoQu9mBvAOIz0xqiIs4Cc8jkTyVcGD5-YluStfFoJ0Yh6GM3q/pub?gid=0&single=true&output=csv';
+
+    Papa.parse(csvUrl, {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: function(results) {
+        const container = document.getElementById('data-container');
+        container.innerHTML = '';
+        const data = results.data;
+
+        // 新しい記事を上に表示（逆順ループ）
+        for (let i = data.length - 1; i >= 0; i--) {
+          const row = data[i];
+          const dateStr = row.date || '';
+          const titleStr = row.title || '';
+          let bodyStr = row.body || '';
+
+          if (!titleStr && !bodyStr) continue;
+
+          // ① セル内のEnter改行を自動で画面の改行に変換
+          bodyStr = bodyStr.replace(/\r\n|\n|\r/g, '<br>');
+
+          // ② [img:画像名] をレトロ枠付き画像に自動変換
+          bodyStr = bodyStr.replace(/\[img:(.+?)\]/g, '<div style="margin: 15px 0; text-align: center;"><img src="$1" style="max-width: 100%; height: auto; border: 1px solid #808080;"></div>');
+
+          const postDiv = document.createElement('div');
+          postDiv.className = 'post';
+          postDiv.innerHTML = `
+            <h2 class="post-title">${titleStr}</h2>
+            <div class="post-date">投稿日時: ${dateStr}</div>
+            <div class="post-body">${bodyStr}</div>
+          `;
+          container.appendChild(postDiv);
+        }
+      },
+      error: function() {
+        document.getElementById('data-container').innerHTML = '<p style="text-align:center;">データの読み込みに失敗しました。</p>';
+      }
+    });
+  </script>
+</body>
+</html>

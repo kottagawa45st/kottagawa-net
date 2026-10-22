@@ -3,8 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5">
+<!-- ★ページタイトル -->
 <title>制作ブログ - 乞田川四畳半スタジオ 4.5st</title>
 <link rel="stylesheet" href="style.css">
+<!-- セル内改行を正しく読み取るための軽量ツール -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 </head>
 <body class="is-not-home">
   <div id="site-box">
@@ -16,13 +19,12 @@
           </a>
         </div>
 
+        <!-- ★画面上の見出し -->
         <div class="direct-page-title">制作ブログ</div>
         
-        <!-- ブログ記事が読み込まれる場所 -->
-        <div class="blog-posts" id="blog-container">
+        <div class="blog-posts" id="data-container">
           <p style="text-align:center; font-size:14px; color:#666;">データを読み込み中...</p>
         </div>
-
       </div>
 
       <!-- 右側メニュー -->
@@ -41,27 +43,33 @@
   </div>
 
   <script>
-    // スプレッドシート（ブログ用）読み込み
+    // ★スプレッドシートのCSV URL
     const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQzTzlj5WZKy0q1KtfLNFPG4pZLBS8FoQu9mBvAOIz0xqiIs4Cc8jkTyVcGD5-YluStfFoJ0Yh6GM3q/pub?gid=0&single=true&output=csv';
-    
-    fetch(csvUrl)
-      .then(response => response.text())
-      .then(csvText => {
-        const rows = csvText.split('\n');
-        const container = document.getElementById('blog-container');
-        container.innerHTML = ''; 
 
-        for (let i = rows.length - 1; i >= 1; i--) {
-          const row = rows[i];
-          if (!row.trim()) continue;
-          
-          const columns = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-          if (columns.length < 3) continue;
+    Papa.parse(csvUrl, {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: function(results) {
+        const container = document.getElementById('data-container');
+        container.innerHTML = '';
+        const data = results.data;
 
-          const dateStr = columns[0].replace(/^"|"$/g, '').trim();
-          const titleStr = columns[1].replace(/^"|"$/g, '').trim();
-          let bodyStr = columns[2].replace(/^"|"$/g, '').trim();
-          
+        // 新しい記事を上に表示（逆順ループ）
+        for (let i = data.length - 1; i >= 0; i--) {
+          const row = data[i];
+          const dateStr = row.date || '';
+          const titleStr = row.title || '';
+          let bodyStr = row.body || '';
+
+          if (!titleStr && !bodyStr) continue;
+
+          // ① セル内のEnter改行を自動で画面の改行に変換
+          bodyStr = bodyStr.replace(/\r\n|\n|\r/g, '<br>');
+
+          // ② [img:画像名] をレトロ枠付き画像に自動変換
+          bodyStr = bodyStr.replace(/\[img:(.+?)\]/g, '<div style="margin: 15px 0; text-align: center;"><img src="$1" style="max-width: 100%; height: auto; border: 1px solid #808080;"></div>');
+
           const postDiv = document.createElement('div');
           postDiv.className = 'post';
           postDiv.innerHTML = `
@@ -71,10 +79,11 @@
           `;
           container.appendChild(postDiv);
         }
-      })
-      .catch(error => {
-        document.getElementById('blog-container').innerHTML = '<p style="text-align:center;">記事の読み込みに失敗しました。</p>';
-      });
+      },
+      error: function() {
+        document.getElementById('data-container').innerHTML = '<p style="text-align:center;">データの読み込みに失敗しました。</p>';
+      }
+    });
   </script>
 </body>
 </html>

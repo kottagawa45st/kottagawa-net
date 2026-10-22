@@ -33,25 +33,27 @@
           <a class="btn-top" href="live.html">出演情報</a>
           <a class="btn-top" href="goods.html">グッズ・物販</a>
           <a class="btn-top" href="contact.html">お問い合わせ</a>
-
         </div>
       </div>
     </div>
-    <div class="site-footer">Since 7th November, the 5th Year of REIWA</div>
+    <div class="site-footer">Since 7th November, the 5th Year of Reiwa</div>
   </div>
 
   <script>
     const DIGIT_COUNT = 8;
     const counterKey = "kottagawa_studio_official_pv_v1";
+
     function runFlipAnimation(targetNumber) {
       const counterDiv = document.getElementById("retro-counter");
       if (!counterDiv) return;
       const targetStr = Math.min(targetNumber, Math.pow(10, DIGIT_COUNT) - 1).toString().padStart(DIGIT_COUNT, '0');
       const spans = counterDiv.getElementsByClassName("digit");
       const fixed = new Array(DIGIT_COUNT).fill(false);
+
       for(let i = 0; i < DIGIT_COUNT; i++) {
         setTimeout(() => { fixed[i] = true; spans[i].innerText = targetStr[i]; }, 500 + (i * 500));
       }
+
       const interval = setInterval(() => {
         let allFixed = true;
         for (let i = 0; i < DIGIT_COUNT; i++) {
@@ -64,12 +66,15 @@
         if (allFixed) clearInterval(interval);
       }, 80);
     }
+
     const apiUrl = "https://countapi.mileshilliard.com/api/v1/hit/" + counterKey;
     fetch(apiUrl).then(r => r.json()).then(data => {
-      let val = parseInt(data.value, 10) || 1; setTimeout(() => runFlipAnimation(val), 1000);
+      let val = parseInt(data.value, 10) || 1; 
+      setTimeout(() => runFlipAnimation(val), 200); // 1000から200へ短縮
     }).catch(e => {
       let localCount = parseInt(localStorage.getItem(counterKey) || "0", 10) + 1;
-      localStorage.setItem(counterKey, localCount); setTimeout(() => runFlipAnimation(localCount), 1000);
+      localStorage.setItem(counterKey, localCount); 
+      setTimeout(() => runFlipAnimation(localCount), 200); // 1000から200へ短縮
     });
   </script>
 </body>

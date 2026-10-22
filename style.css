@@ -24,28 +24,16 @@ a:hover { color: #ff0000; }
 body.is-home #site-box { max-width: 800px; text-align: center; }
 body.is-not-home #site-box { max-width: 900px; text-align: left; }
 
-/* ▼ ロゴ設定（レトロフィルター追加） */
-.logo-top {
-  max-width: 100%;
-  height: auto;
-  margin-bottom: 20px;
-  image-rendering: pixelated;
-  filter: drop-shadow(2px 2px 0px #000000);
-}
-.logo-page {
-  max-width: 250px;
-  height: auto;
-  border: none;
-  image-rendering: pixelated;
-  filter: drop-shadow(2px 2px 0px #000000);
-}
+/* ▼ ロゴ設定（フィルターを削除して元に戻した状態） */
+.logo-top { max-width: 100%; height: auto; margin-bottom: 20px; }
+.logo-page { max-width: 250px; height: auto; border: none; }
 .page-logo-area { border-bottom: 1px solid #808080; margin-bottom: 20px; padding-bottom: 10px; }
 
 .counter-container {
   margin: 25px auto; display: inline-flex; align-items: center;
   background-color: #333; padding: 5px; border: 3px inset #808080;
 }
-.counter-title { color: #00ff00; margin-right: 8px; font-size: 16px;}
+.counter-title { color: #00ff00; margin-right: 8px; font-size: 16px; }
 .flip-digits { display: flex; gap: 2px; }
 .digit {
   background-color: #111; color: #fff; font-family: "Courier New", monospace;
@@ -57,7 +45,7 @@ body.is-not-home #site-box { max-width: 900px; text-align: left; }
   background-color: #000; box-shadow: 0 1px 0 rgba(255,255,255,0.1);
 }
 
-.catch-copy { line-height: 1.8; white-space: nowrap; font-size: 18px; margin: 35px 0 45px 0;}
+.catch-copy { line-height: 1.8; white-space: nowrap; font-size: 18px; margin: 35px 0 45px 0; }
 
 .button-group-top {
   display: flex; flex-direction: column; gap: 12px;
@@ -73,9 +61,9 @@ body.is-not-home #site-box { max-width: 900px; text-align: left; }
 
 .content-wrapper { display: flex; align-items: flex-start; }
 .left-content { flex: 1; box-sizing: border-box; }
-body.is-not-home .left-content { border-right: 2px groove #c0c0c0; padding-right: 30px;}
+body.is-not-home .left-content { border-right: 2px groove #c0c0c0; padding-right: 30px; }
 
-.right-sidebar { width: 180px; box-sizing: border-box; position: sticky; top: 20px; padding-left: 20px;}
+.right-sidebar { width: 180px; box-sizing: border-box; position: sticky; top: 20px; padding-left: 20px; }
 .button-group-side { display: flex; flex-direction: column; gap: 12px; }
 .btn-side {
   background-color: #c0c0c0; border: 2px solid; border-color: #ffffff #808080 #808080 #ffffff;

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5">
+<title>制作ブログ - 乞田川四畳半スタジオ 4.5st</title>
+<link rel="stylesheet" href="style.css">
+<!-- CSVパース用ライブラリ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+<style>
+  /* 個別記事専用装飾 */
+  .post-detail-box {
+    border: 1px solid #808080;
+    background-color: #fcfcfc;
+    padding: 22px;
+    margin-top: 15px;
+    box-sizing: border-box;
+  }
+  .post-detail-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #0000cc;
+    border-bottom: 2px solid #c0c0c0;
+    padding-bottom: 8px;
+    margin: 0 0 10px 0;
+    line-height: 1.4;
+  }
+  .post-detail-date {
+    font-size: 13px;
+    color: #666666;
+    font-family: "Courier New", monospace;
+    margin-bottom: 20px;
+  }
+  .post-detail-body {
+    font-size: 15px;
+    line-height: 1.9;
+    color: #222222;
+    word-break: break-all;
+  }
+  .post-detail-body img {
+    max-width: 100%;
+    height: auto;
+    margin: 15px 0;
+    border: 1px solid #808080;
+    display: block;
+  }
+
+  /* 前後記事ナビゲーションバー */
+  .post-nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    padding-top: 15px;
+    border-top: 1px dotted #808080;
+    font-size: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .post-nav-link {
+    color: #0000cc;
+    text-decoration: underline;
+  }
+  .post-nav-link:hover {
+    color: #ff0000;
+  }
+  .post-nav-center {
+    color: #333333;
+    text-decoration: underline;
+    font-weight: bold;
+  }
+  .post-nav-center:hover {
+    color: #0000cc;
+  }
+  .post-nav-disabled {
+    color: #aaaaaa;
+    user-select: none;
+  }
+  #loading-notice {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body class="is-not-home">
+  <div id="site-box">
+    <div class="content-wrapper">
+      <div class="left-content">
+        <div class="page-logo-area">
+          <a href="index.html">
+            <img alt="乞田川四畳半スタジオ 4.5st" class="logo-page" src="KOTTAGAWA_LOGO.PNG">
+          </a>
+        </div>
+
+        <div class="direct-page-title" id="page-heading">制作ブログ</div>
+
+        <!-- 読み込み中表示 -->
+        <div id="loading-notice">記事を読み込み中...</div>
+
+        <!-- 記事本文コンテナ -->
+        <div id="post-container" style="display: none;">
+          <div class="post-detail-box">
+            <h1 class="post-detail-title" id="post-title"></h1>
+            <div class="post-detail-date" id="post-date"></div>
+            <div class="post-detail-body" id="post-body"></div>
+
+            <!-- 前後記事ナビゲーション -->
+            <div class="post-nav-bar">
+              <span id="nav-newer"></span>
+              <a class="post-nav-center" href="blog.html">≪ ブログ一覧へ戻る</a>
+              <span id="nav-older"></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 右側メニュー -->
+      <div class="right-sidebar">
+        <div class="button-group-side">
+          <a class="btn-side" href="about.html">概 要</a>
+          <a class="btn-side" href="staff.html">所属職員</a>
+          <a class="btn-side" href="blog.html">制作ブログ</a>
+          <a class="btn-side" href="live.html">出演情報</a>
+          <a class="btn-side" href="goods.html">グッズ・物販</a>
+          <a class="btn-side" href="contact.html">御問合せ</a>
+        </div>
+      </div>
+    </div>
+    <div class="site-footer">Since 11th August, the 5th Year of REIWA</div>
+  </div>
+
+  <script>
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQzTzlj5WZKy0q1KtfLNFPG4pZLBS8FoQu9mBvAOIz0xqiIs4Cc8jkTyVcGD5-YluStfFoJ0Yh6GM3q/pub?gid=0&single=true&output=csv";
+
+    function formatContent(text) {
+      if (!text) return "";
+      let html = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      html = html.replace(/\[img:(.*?)\]/g, '<img src="$1" alt="添付画像">');
+      html = html.replace(/\r?\n/g, "<br>");
+      return html;
+    }
+
+    // URLの「?id=〇〇」から記事IDを取得
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetId = parseInt(urlParams.get("id"), 10);
+
+    Papa.parse(CSV_URL, {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: function(results) {
+        document.getElementById("loading-notice").style.display = "none";
+        let data = results.data;
+
+        data.forEach((row, index) => {
+          row._originalIndex = index;
+        });
+
+        // 日付降順・同日は行番号降順にソート
+        data.sort((a, b) => {
+          let dateA = (a["日付"] || a["date"] || "").trim();
+          let dateB = (b["日付"] || b["date"] || "").trim();
+          let dateDiff = dateB.localeCompare(dateA);
+          if (dateDiff !== 0) return dateDiff;
+          return b._originalIndex - a._originalIndex;
+        });
+
+        // 該当記事のソート後配列内でのインデックスを探す
+        const currentIndex = data.findIndex(p => p._originalIndex === targetId);
+
+        if (currentIndex === -1) {
+          document.getElementById("page-heading").textContent = "記事が見つかりません";
+          document.getElementById("loading-notice").style.display = "block";
+          document.getElementById("loading-notice").innerHTML = `
+            <p>指定された記事が存在しないか、削除された可能性があります。</p>
+            <p><a href="blog.html" style="color: #0000cc;">制作ブログ一覧へ戻る</a></p>
+          `;
+          return;
+        }
+
+        const post = data[currentIndex];
+        const title = post["タイトル"] || post["title"] || "無題";
+        const date = post["日付"] || post["date"] || "";
+        const rawBody = post["本文"] || post["body"] || post["content"] || "";
+
+        // ページタイトルと内容を反映
+        document.title = `${title} - 乞田川四畳半スタジオ 4.5st`;
+        document.getElementById("post-title").textContent = title;
+        document.getElementById("post-date").textContent = date;
+        document.getElementById("post-body").innerHTML = formatContent(rawBody);
+
+        // 新しい記事へのリンク（配列の1つ前）
+        const newerArea = document.getElementById("nav-newer");
+        if (currentIndex > 0) {
+          const newerPost = data[currentIndex - 1];
+          newerArea.innerHTML = `<a class="post-nav-link" href="post.html?id=${newerPost._originalIndex}">← 新しい記事へ</a>`;
+        } else {
+          newerArea.innerHTML = `<span class="post-nav-disabled">← 新しい記事へ</span>`;
+        }
+
+        // 古い記事へのリンク（配列の1つ後）
+        const olderArea = document.getElementById("nav-older");
+        if (currentIndex < data.length - 1) {
+          const olderPost = data[currentIndex + 1];
+          olderArea.innerHTML = `<a class="post-nav-link" href="post.html?id=${olderPost._originalIndex}">古い記事へ →</a>`;
+        } else {
+          olderArea.innerHTML = `<span class="post-nav-disabled">古い記事へ →</span>`;
+        }
+
+        document.getElementById("post-container").style.display = "block";
+      },
+      error: function() {
+        document.getElementById("loading-notice").textContent = "記事データの読み込みに失敗しました。";
+      }
+    });
+  </script>
+</body>
+</html>

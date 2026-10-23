@@ -207,7 +207,7 @@
         </div>
       </div>
     </div>
-    <div class="site-footer">Since 11th August, the 5th Year of Reiwa</div>
+    <div class="site-footer">Since 11th August, the 5th Year of REIWA</div>
   </div>
 
   <script>
@@ -378,4 +378,34 @@
       nextBtn.textContent = "次の100件 ≫";
       nextBtn.disabled = (currentPage === totalPages);
       nextBtn.onclick = () => renderPage(currentPage + 1);
-      btnArea.appendChild(nextBtn
+      btnArea.appendChild(nextBtn);
+    }
+
+    Papa.parse(CSV_URL, {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: function(results) {
+        document.getElementById("loading-notice").style.display = "none";
+        let data = results.data;
+
+        data.sort((a, b) => {
+          let dateA = (a["日付"] || a["date"] || "").trim();
+          let dateB = (b["日付"] || b["date"] || "").trim();
+          return dateB.localeCompare(dateA);
+        });
+
+        allPosts = data;
+        if (allPosts.length > 0) {
+          renderPage(1);
+        } else {
+          document.getElementById("blog-container").innerHTML = "<p style='text-align:center; color:#666;'>記事はまだありません。</p>";
+        }
+      },
+      error: function(err) {
+        document.getElementById("loading-notice").textContent = "データの読み込みに失敗しました。";
+      }
+    });
+  </script>
+</body>
+</html>

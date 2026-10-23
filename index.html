@@ -13,10 +13,17 @@
         <img alt="乞田川四畳半スタジオ 4.5st" class="logo-top" src="KOTTAGAWA_LOGO.PNG">
       </a><br>
       <div class="counter-container">
-        <span class="counter-title">アクセスカウンタ</span>
+        <span class="counter-title">貴方は</span>
         <div class="flip-digits" id="retro-counter">
-          <span class="digit">0</span><span class="digit">0</span><span class="digit">0</span><span class="digit">0</span>
-          <span class="digit">0</span><span class="digit">0</span><span class="digit">0</span><span class="digit">0</span>
+          <span class="digit">0</span>
+	　<span class="digit">0</span>
+	　<span class="digit">0</span>
+	　<span class="digit">0</span>
+          <span class="digit">0</span>
+	　<span class="digit">0</span>
+	　<span class="digit">0</span>
+	　<span class="digit">0</span>
+	　人目
         </div>
       </div>
       <div class="catch-copy">
@@ -70,11 +77,11 @@
     const apiUrl = "https://countapi.mileshilliard.com/api/v1/hit/" + counterKey;
     fetch(apiUrl).then(r => r.json()).then(data => {
       let val = parseInt(data.value, 10) || 1; 
-      setTimeout(() => runFlipAnimation(val), 200); // 1000から200へ短縮
+      setTimeout(() => runFlipAnimation(val), 250); // 1000から250へ短縮
     }).catch(e => {
       let localCount = parseInt(localStorage.getItem(counterKey) || "0", 10) + 1;
       localStorage.setItem(counterKey, localCount); 
-      setTimeout(() => runFlipAnimation(localCount), 200); // 1000から200へ短縮
+      setTimeout(() => runFlipAnimation(localCount), 250); // 1000から250へ短縮
     });
   </script>
 </body>

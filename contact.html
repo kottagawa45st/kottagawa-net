@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5">
-<title>お問い合わせ - 乞田川四畳半スタジオ 4.5st</title>
+<title>御問合せ - 乞田川四畳半スタジオ 4.5st</title>
 <link rel="stylesheet" href="style.css">
 <style>
   /* 90年代レトロフォーム専用装飾 */
@@ -97,6 +97,23 @@
     line-height: 1.6;
   }
 
+  /* ドメイン受信設定の注意書き枠 */
+  .domain-notice {
+    margin-top: 15px;
+    padding: 10px 12px;
+    background-color: #ffffcc;
+    border: 1px dashed #cc6600;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #333333;
+  }
+  .domain-notice em {
+    font-style: italic;
+    font-weight: bold;
+    color: #990000;
+    font-family: "Courier New", monospace;
+  }
+
   /* 結果表示ボックス */
   .result-box {
     text-align: center;
@@ -114,28 +131,28 @@
       <div class="left-content">
         <div class="page-logo-area">
           <a href="index.html">
-            <img alt="乞田川四畳半スタジオ 4.5st" class="logo-page" src="KOTTAGAWA_LOGO.PNG">
+            <img alt="乞田川四畳半スタジオ 4.5st" class="logo-page" src="KOTTAGAWA_LOGO.png">
           </a>
         </div>
 
-        <div class="direct-page-title">お問い合わせ</div>
+        <div class="direct-page-title">御問合せ</div>
         
         <!-- ================= ① 入力ステップ ================= -->
         <div id="step-input">
           <p style="font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
-            出演依頼、楽曲制作、取材等の各種お問い合わせは下記フォームより承っております。<br>
+            出演依頼、楽曲制作、取材等の各種御問合せは下記フォームより承っております。<br>
             必要事項をご記入の上、「確認画面へ」ボタンを押してください。
           </p>
 
           <form class="contact-box" id="contact-form" onsubmit="event.preventDefault(); goToConfirm();">
             <div class="form-group">
-              <label class="form-label" for="in-name">御名前 / 御社名</label>
+              <label class="form-label" for="in-name">御名前 / 貴社名</label>
               <input class="form-input" type="text" id="in-name" placeholder="例：乞田川 太郎">
             </div>
 
             <div class="form-group">
               <label class="form-label" for="in-email">メールアドレス<span class="required-badge">*必須</span></label>
-              <input class="form-input" type="email" id="in-email" required placeholder="youradress@example.com">
+              <input class="form-input" type="email" id="in-email" required placeholder="youraddress@example.com">
             </div>
 
             <div class="form-group">
@@ -144,8 +161,8 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="in-message">お問い合わせ内容<span class="required-badge">*必須</span></label>
-              <textarea class="form-textarea" id="in-message" required placeholder="お問い合わせ内容をご入力ください"></textarea>
+              <label class="form-label" for="in-message">御問合せ内容<span class="required-badge">*必須</span></label>
+              <textarea class="form-textarea" id="in-message" required placeholder="御問合せ内容をご入力ください"></textarea>
             </div>
 
             <div class="form-actions">
@@ -164,7 +181,7 @@
           <div class="contact-box">
             <table class="confirm-table">
               <tr>
-                <th>御名前 / 御社名</th>
+                <th>御名前 / 貴社名</th>
                 <td id="cf-name"></td>
               </tr>
               <tr>
@@ -176,10 +193,15 @@
                 <td id="cf-subject"></td>
               </tr>
               <tr>
-                <th>お問い合わせ内容</th>
+                <th>御問合せ内容</th>
                 <td id="cf-message"></td>
               </tr>
             </table>
+
+            <!-- ドメイン受信指定のアナウンス枠 -->
+            <div class="domain-notice">
+              ※当スタジオからの返信が迷惑メールフォルダに振り分けられるのを防ぐため、事前に <em>@kottagawa.net</em> からのメールを受信できるよう必ず設定してください。
+            </div>
 
             <div class="form-actions">
               <button class="btn-retro" type="button" onclick="backToInput();">≪ 修正する</button>
@@ -193,7 +215,7 @@
           <div class="contact-box result-box">
             <div class="result-success">正常に送信されました。</div>
             <p style="margin: 15px 0;">
-              お問い合わせいただき誠にありがとうございます。<br>
+              御問合せいただき誠にありがとうございます。<br>
               内容を確認次第、担当者よりご連絡を差し上げます。
             </p>
             <div class="form-actions" style="margin-top: 20px;">
@@ -227,18 +249,17 @@
           <a class="btn-side" href="blog.html">制作ブログ</a>
           <a class="btn-side" href="live.html">出演情報</a>
           <a class="btn-side" href="goods.html">グッズ・物販</a>
-          <a class="btn-side" href="contact.html">お問い合わせ</a>
+          <a class="btn-side" href="contact.html">御問合せ</a>
         </div>
       </div>
     </div>
-    <div class="site-footer">Since 7th November, the 5th Year of REIWA</div>
+    <div class="site-footer">Since 7th November, the 5th Year of Reiwa</div>
   </div>
 
   <script>
     // ★発行されたGoogle Apps ScriptのウェブアプリURLを貼り付けてください
-    const gasUrl = "https://script.google.com/macros/s/AKfycbylkZARfp8JikVL7I5wrQdkTND5_bIjYt5D6a_Fk1BAq-IhwNn7_PkO2SJVrzj3ym2-/exec";
+    const gasUrl = "https://script.google.com/macros/s/AKfycbyb1z2R_3xWz7lY.../exec";
 
-    // 画面切り替え関数
     function showStep(stepId) {
       document.getElementById('step-input').style.display = 'none';
       document.getElementById('step-confirm').style.display = 'none';
@@ -248,7 +269,6 @@
       window.scrollTo(0, 0);
     }
 
-    // ① 確認画面へ進む処理
     function goToConfirm() {
       const name = document.getElementById('in-name').value.trim() || '（未入力）';
       const email = document.getElementById('in-email').value.trim();
@@ -258,14 +278,11 @@
       document.getElementById('cf-name').textContent = name;
       document.getElementById('cf-email').textContent = email;
       document.getElementById('cf-subject').textContent = subject;
-      
-      // 改行を保持して確認表示
       document.getElementById('cf-message').innerHTML = message.replace(/\n/g, '<br>');
 
       showStep('step-confirm');
     }
 
-    // ② 入力画面へ戻る（入力値はそのまま維持）
     function backToInput() {
       showStep('step-input');
     }
@@ -274,7 +291,6 @@
       showStep('step-confirm');
     }
 
-    // ③ GASへ送信処理
     function sendForm() {
       const btn = document.getElementById('btn-send');
       btn.disabled = true;

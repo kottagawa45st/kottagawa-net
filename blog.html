@@ -211,7 +211,7 @@
   </div>
 
   <script>
-    // ★お使いのGoogleスプレッドシート（blogシート）のCSV出力URLに書き換えてください
+    // ★お使いのGoogleスプレッドシート（blogシート）のCSV出力URL
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQzTzlj5WZKy0q1KtfLNFPG4pZLBS8FoQu9mBvAOIz0xqiIs4Cc8jkTyVcGD5-YluStfFoJ0Yh6GM3q/pub?gid=0&single=true&output=csv";
 
     const PAGE_SIZE = 100;
@@ -239,7 +239,6 @@
       return "（本文なし）";
     }
 
-    // 記事の開閉切り替え
     function togglePost(index) {
       const body = document.getElementById("post-body-" + index);
       const icon = document.getElementById("post-icon-" + index);
@@ -253,10 +252,8 @@
       }
     }
 
-    // 前後の記事へダイレクト移動
     function goToPost(targetIndex) {
       if (targetIndex < 0 || targetIndex >= allPosts.length) return;
-
       const targetPage = Math.floor(targetIndex / PAGE_SIZE) + 1;
       if (targetPage !== currentPage) {
         renderPage(targetPage, targetIndex);
@@ -265,15 +262,12 @@
       }
     }
 
-    // 特定の記事を開いてスクロール
     function openSinglePost(index) {
-      // 一旦他の開いている記事を閉じる
       const openBodies = document.querySelectorAll('.blog-body-container');
       const openIcons = document.querySelectorAll('[id^="post-icon-"]');
       openBodies.forEach(b => b.style.display = 'none');
       openIcons.forEach(i => i.textContent = '▶');
 
-      // 指定記事を開く
       const body = document.getElementById("post-body-" + index);
       const icon = document.getElementById("post-icon-" + index);
       const itemElem = document.getElementById("post-item-" + index);
@@ -286,7 +280,6 @@
       }
     }
 
-    // ページの描画
     function renderPage(page, openIndexAfterRender = null) {
       currentPage = page;
       const container = document.getElementById("blog-container");
@@ -304,12 +297,10 @@
         const firstLine = getFirstLine(rawBody);
         const fullContent = formatContent(rawBody);
 
-        // 新しい記事（itemIdx - 1）へのナビ
         const prevHtml = itemIdx > 0
           ? `<span class="post-nav-link" onclick="goToPost(${itemIdx - 1})">← 新しい記事へ</span>`
           : `<span class="post-nav-disabled">← 新しい記事へ</span>`;
 
-        // 古い記事（itemIdx + 1）へのナビ
         const nextHtml = itemIdx < allPosts.length - 1
           ? `<span class="post-nav-link" onclick="goToPost(${itemIdx + 1})">古い記事へ →</span>`
           : `<span class="post-nav-disabled">古い記事へ →</span>`;
@@ -327,8 +318,6 @@
           </div>
           <div class="blog-body-container" id="post-body-${itemIdx}">
             <div>${fullContent}</div>
-            
-            <!-- 前後記事ナビゲーション -->
             <div class="post-nav-bar">
               ${prevHtml}
               <span class="post-nav-close" onclick="togglePost(${itemIdx})">▲ 閉じる</span>
@@ -389,10 +378,22 @@
         document.getElementById("loading-notice").style.display = "none";
         let data = results.data;
 
+        // ★修正ポイント：元の行番号（追加順）を記録
+        data.forEach((row, index) => {
+          row._originalIndex = index;
+        });
+
+        // ★修正ポイント：日付で降順ソート。同じ日付なら行番号の降順（下にあるものを上へ）
         data.sort((a, b) => {
           let dateA = (a["日付"] || a["date"] || "").trim();
           let dateB = (b["日付"] || b["date"] || "").trim();
-          return dateB.localeCompare(dateA);
+          let dateDiff = dateB.localeCompare(dateA);
+          
+          if (dateDiff !== 0) {
+            return dateDiff; // 日付が違う場合は日付順
+          }
+          // 日付が同じ場合は元のインデックスを比較
+          return b._originalIndex - a._originalIndex;
         });
 
         allPosts = data;

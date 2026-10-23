@@ -9,7 +9,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
 <style>
-  /* ブログ一覧・アコーディオン装飾 */
+  /* ブログ一覧装飾 */
   .blog-list {
     margin-top: 15px;
   }
@@ -23,10 +23,6 @@
   }
   .blog-item:hover {
     background-color: #ffffff;
-  }
-  .blog-item-header {
-    cursor: pointer;
-    user-select: none;
   }
   .blog-title-row {
     display: flex;
@@ -59,61 +55,6 @@
     padding-left: 14px;
     border-left: 2px solid #c0c0c0;
     word-break: break-all;
-  }
-  
-  /* 展開される記事本文 */
-  .blog-body-container {
-    display: none;
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px dashed #808080;
-    font-size: 14px;
-    line-height: 1.8;
-    color: #222222;
-    word-break: break-all;
-  }
-  .blog-body-container img {
-    max-width: 100%;
-    height: auto;
-    margin: 10px 0;
-    border: 1px solid #808080;
-    display: block;
-  }
-
-  /* 記事下部 前後ナビゲーション */
-  .post-nav-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px;
-    padding-top: 12px;
-    border-top: 1px dotted #808080;
-    font-size: 13px;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .post-nav-link {
-    color: #0000cc;
-    cursor: pointer;
-    text-decoration: underline;
-    user-select: none;
-  }
-  .post-nav-link:hover {
-    color: #ff0000;
-  }
-  .post-nav-close {
-    color: #555555;
-    cursor: pointer;
-    text-decoration: underline;
-    user-select: none;
-  }
-  .post-nav-close:hover {
-    color: #000000;
-  }
-  .post-nav-disabled {
-    color: #aaaaaa;
-    cursor: default;
-    user-select: none;
   }
 
   /* ページネーション（100件区切りナビ） */
@@ -211,20 +152,11 @@
   </div>
 
   <script>
-    // ★お使いのGoogleスプレッドシート（blogシート）のCSV出力URL
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQzTzlj5WZKy0q1KtfLNFPG4pZLBS8FoQu9mBvAOIz0xqiIs4Cc8jkTyVcGD5-YluStfFoJ0Yh6GM3q/pub?gid=0&single=true&output=csv";
 
     const PAGE_SIZE = 100;
     let allPosts = [];
     let currentPage = 1;
-
-    function formatContent(text) {
-      if (!text) return "";
-      let html = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      html = html.replace(/\[img:(.*?)\]/g, '<img src="$1" alt="添付画像">');
-      html = html.replace(/\r?\n/g, "<br>");
-      return html;
-    }
 
     function getFirstLine(text) {
       if (!text) return "（本文なし）";
@@ -239,48 +171,7 @@
       return "（本文なし）";
     }
 
-    function togglePost(index) {
-      const body = document.getElementById("post-body-" + index);
-      const icon = document.getElementById("post-icon-" + index);
-      if (!body) return;
-      if (body.style.display === "none" || body.style.display === "") {
-        body.style.display = "block";
-        if (icon) icon.textContent = "▼";
-      } else {
-        body.style.display = "none";
-        if (icon) icon.textContent = "▶";
-      }
-    }
-
-    function goToPost(targetIndex) {
-      if (targetIndex < 0 || targetIndex >= allPosts.length) return;
-      const targetPage = Math.floor(targetIndex / PAGE_SIZE) + 1;
-      if (targetPage !== currentPage) {
-        renderPage(targetPage, targetIndex);
-      } else {
-        openSinglePost(targetIndex);
-      }
-    }
-
-    function openSinglePost(index) {
-      const openBodies = document.querySelectorAll('.blog-body-container');
-      const openIcons = document.querySelectorAll('[id^="post-icon-"]');
-      openBodies.forEach(b => b.style.display = 'none');
-      openIcons.forEach(i => i.textContent = '▶');
-
-      const body = document.getElementById("post-body-" + index);
-      const icon = document.getElementById("post-icon-" + index);
-      const itemElem = document.getElementById("post-item-" + index);
-      if (body) {
-        body.style.display = "block";
-        if (icon) icon.textContent = "▼";
-      }
-      if (itemElem) {
-        itemElem.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    }
-
-    function renderPage(page, openIndexAfterRender = null) {
+    function renderPage(page) {
       currentPage = page;
       const container = document.getElementById("blog-container");
       container.innerHTML = "";
@@ -289,52 +180,26 @@
       const end = Math.min(start + PAGE_SIZE, allPosts.length);
       const currentPosts = allPosts.slice(start, end);
 
-      currentPosts.forEach((post, i) => {
-        const itemIdx = start + i;
+      currentPosts.forEach((post) => {
         const title = post["タイトル"] || post["title"] || "無題";
         const date = post["日付"] || post["date"] || "";
         const rawBody = post["本文"] || post["body"] || post["content"] || "";
         const firstLine = getFirstLine(rawBody);
-        const fullContent = formatContent(rawBody);
-
-        const prevHtml = itemIdx > 0
-          ? `<span class="post-nav-link" onclick="goToPost(${itemIdx - 1})">← 新しい記事へ</span>`
-          : `<span class="post-nav-disabled">← 新しい記事へ</span>`;
-
-        const nextHtml = itemIdx < allPosts.length - 1
-          ? `<span class="post-nav-link" onclick="goToPost(${itemIdx + 1})">古い記事へ →</span>`
-          : `<span class="post-nav-disabled">古い記事へ →</span>`;
 
         const itemDiv = document.createElement("div");
         itemDiv.className = "blog-item";
-        itemDiv.id = "post-item-" + itemIdx;
         itemDiv.innerHTML = `
-          <div class="blog-item-header" onclick="togglePost(${itemIdx})">
-            <div class="blog-title-row">
-              <span class="blog-title"><span id="post-icon-${itemIdx}">▶</span> ${title}</span>
-              <span class="blog-date">${date}</span>
-            </div>
-            <div class="blog-summary">${firstLine}</div>
+          <div class="blog-title-row">
+            <a class="blog-title" href="post.html?id=${post._originalIndex}">▶ ${title}</a>
+            <span class="blog-date">${date}</span>
           </div>
-          <div class="blog-body-container" id="post-body-${itemIdx}">
-            <div>${fullContent}</div>
-            <div class="post-nav-bar">
-              ${prevHtml}
-              <span class="post-nav-close" onclick="togglePost(${itemIdx})">▲ 閉じる</span>
-              ${nextHtml}
-            </div>
-          </div>
+          <div class="blog-summary">${firstLine}</div>
         `;
         container.appendChild(itemDiv);
       });
 
       renderPagination(start + 1, end, allPosts.length);
-
-      if (openIndexAfterRender !== null) {
-        openSinglePost(openIndexAfterRender);
-      } else {
-        window.scrollTo(0, 0);
-      }
+      window.scrollTo(0, 0);
     }
 
     function renderPagination(startNum, endNum, total) {
@@ -378,21 +243,15 @@
         document.getElementById("loading-notice").style.display = "none";
         let data = results.data;
 
-        // ★修正ポイント：元の行番号（追加順）を記録
         data.forEach((row, index) => {
           row._originalIndex = index;
         });
 
-        // ★修正ポイント：日付で降順ソート。同じ日付なら行番号の降順（下にあるものを上へ）
         data.sort((a, b) => {
           let dateA = (a["日付"] || a["date"] || "").trim();
           let dateB = (b["日付"] || b["date"] || "").trim();
           let dateDiff = dateB.localeCompare(dateA);
-          
-          if (dateDiff !== 0) {
-            return dateDiff; // 日付が違う場合は日付順
-          }
-          // 日付が同じ場合は元のインデックスを比較
+          if (dateDiff !== 0) return dateDiff;
           return b._originalIndex - a._originalIndex;
         });
 
@@ -403,7 +262,7 @@
           document.getElementById("blog-container").innerHTML = "<p style='text-align:center; color:#666;'>記事はまだありません。</p>";
         }
       },
-      error: function(err) {
+      error: function() {
         document.getElementById("loading-notice").textContent = "データの読み込みに失敗しました。";
       }
     });

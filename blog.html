@@ -3,11 +3,172 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5">
-<!-- ★ページタイトル -->
 <title>制作ブログ - 乞田川四畳半スタジオ 4.5st</title>
 <link rel="stylesheet" href="style.css">
-<!-- セル内改行を正しく読み取るための軽量ツール -->
+<!-- CSVパース用ライブラリ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+<style>
+  /* ブログ一覧・アコーディオン装飾 */
+  .blog-list {
+    margin-top: 15px;
+  }
+  .blog-item {
+    border: 1px solid #c0c0c0;
+    background-color: #fafafa;
+    margin-bottom: 12px;
+    padding: 12px 14px;
+    box-sizing: border-box;
+    transition: background-color 0.1s;
+  }
+  .blog-item:hover {
+    background-color: #ffffff;
+  }
+  .blog-item-header {
+    cursor: pointer;
+    user-select: none;
+  }
+  .blog-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .blog-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #0000cc;
+    text-decoration: underline;
+  }
+  .blog-title:hover {
+    color: #ff0000;
+  }
+  .blog-date {
+    font-size: 12px;
+    color: #666666;
+    font-family: "Courier New", monospace;
+    white-space: nowrap;
+  }
+  .blog-summary {
+    font-size: 13px;
+    color: #555555;
+    line-height: 1.5;
+    margin-top: 4px;
+    padding-left: 14px;
+    border-left: 2px solid #c0c0c0;
+    word-break: break-all;
+  }
+  
+  /* 展開される記事本文 */
+  .blog-body-container {
+    display: none;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #808080;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #222222;
+    word-break: break-all;
+  }
+  .blog-body-container img {
+    max-width: 100%;
+    height: auto;
+    margin: 10px 0;
+    border: 1px solid #808080;
+    display: block;
+  }
+
+  /* 記事下部 前後ナビゲーション */
+  .post-nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 12px;
+    border-top: 1px dotted #808080;
+    font-size: 13px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .post-nav-link {
+    color: #0000cc;
+    cursor: pointer;
+    text-decoration: underline;
+    user-select: none;
+  }
+  .post-nav-link:hover {
+    color: #ff0000;
+  }
+  .post-nav-close {
+    color: #555555;
+    cursor: pointer;
+    text-decoration: underline;
+    user-select: none;
+  }
+  .post-nav-close:hover {
+    color: #000000;
+  }
+  .post-nav-disabled {
+    color: #aaaaaa;
+    cursor: default;
+    user-select: none;
+  }
+
+  /* ページネーション（100件区切りナビ） */
+  .pagination-container {
+    margin: 30px 0 15px 0;
+    padding: 12px;
+    background-color: #f0f0f0;
+    border: 2px inset #808080;
+    text-align: center;
+    font-size: 13px;
+  }
+  .pagination-info {
+    margin-bottom: 8px;
+    color: #444444;
+  }
+  .pagination-links {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .page-btn {
+    background-color: #c0c0c0;
+    border: 2px solid;
+    border-color: #ffffff #808080 #808080 #ffffff;
+    color: #000000;
+    padding: 3px 8px;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .page-btn:active {
+    border-color: #808080 #ffffff #ffffff #808080;
+  }
+  .page-btn.active {
+    font-weight: bold;
+    background-color: #000080;
+    color: #ffffff;
+    border-color: #808080 #ffffff #ffffff #808080;
+    cursor: default;
+  }
+  .page-btn:disabled {
+    color: #888888;
+    cursor: not-allowed;
+    border-color: #ffffff #808080 #808080 #ffffff;
+  }
+  #loading-notice {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+  }
+</style>
 </head>
 <body class="is-not-home">
   <div id="site-box">
@@ -19,11 +180,18 @@
           </a>
         </div>
 
-        <!-- ★画面上の見出し -->
         <div class="direct-page-title">制作ブログ</div>
-        
-        <div class="blog-posts" id="data-container">
-          <p style="text-align:center; font-size:14px; color:#666;">データを読み込み中...</p>
+
+        <!-- 読み込み中表示 -->
+        <div id="loading-notice">記事データを取得中...</div>
+
+        <!-- 記事一覧コンテナ -->
+        <div class="blog-list" id="blog-container"></div>
+
+        <!-- ページ送りナビゲーション -->
+        <div class="pagination-container" id="pagination-nav" style="display: none;">
+          <div class="pagination-info" id="pagination-info"></div>
+          <div class="pagination-links" id="pagination-buttons"></div>
         </div>
       </div>
 
@@ -35,56 +203,179 @@
           <a class="btn-side" href="blog.html">制作ブログ</a>
           <a class="btn-side" href="live.html">出演情報</a>
           <a class="btn-side" href="goods.html">グッズ・物販</a>
-          <a class="btn-side" href="contact.html">お問い合わせ</a>
-
+          <a class="btn-side" href="contact.html">御問合せ</a>
         </div>
       </div>
     </div>
-    <div class="site-footer">Since 7th November, the 5th Year of REIWA</div>
+    <div class="site-footer">Since 11th August, the 5th Year of Reiwa</div>
   </div>
 
   <script>
-    // ★スプレッドシートのCSV URL
-    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQzTzlj5WZKy0q1KtfLNFPG4pZLBS8FoQu9mBvAOIz0xqiIs4Cc8jkTyVcGD5-YluStfFoJ0Yh6GM3q/pub?gid=0&single=true&output=csv';
+    // ★お使いのGoogleスプレッドシート（blogシート）のCSV出力URLに書き換えてください
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQzTzlj5WZKy0q1KtfLNFPG4pZLBS8FoQu9mBvAOIz0xqiIs4Cc8jkTyVcGD5-YluStfFoJ0Yh6GM3q/pub?gid=0&single=true&output=csv";
 
-    Papa.parse(csvUrl, {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      complete: function(results) {
-        const container = document.getElementById('data-container');
-        container.innerHTML = '';
-        const data = results.data;
+    const PAGE_SIZE = 100;
+    let allPosts = [];
+    let currentPage = 1;
 
-        // 新しい記事を上に表示（逆順ループ）
-        for (let i = data.length - 1; i >= 0; i--) {
-          const row = data[i];
-          const dateStr = row.date || '';
-          const titleStr = row.title || '';
-          let bodyStr = row.body || '';
+    function formatContent(text) {
+      if (!text) return "";
+      let html = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      html = html.replace(/\[img:(.*?)\]/g, '<img src="$1" alt="添付画像">');
+      html = html.replace(/\r?\n/g, "<br>");
+      return html;
+    }
 
-          if (!titleStr && !bodyStr) continue;
-
-          // ① セル内のEnter改行を自動で画面の改行に変換
-          bodyStr = bodyStr.replace(/\r\n|\n|\r/g, '<br>');
-
-          // ② [img:画像名] をレトロ枠付き画像に自動変換
-          bodyStr = bodyStr.replace(/\[img:(.+?)\]/g, '<div style="margin: 15px 0; text-align: center;"><img src="$1" style="max-width: 100%; height: auto; border: 1px solid #808080;"></div>');
-
-          const postDiv = document.createElement('div');
-          postDiv.className = 'post';
-          postDiv.innerHTML = `
-            <h2 class="post-title">${titleStr}</h2>
-            <div class="post-date">投稿日時: ${dateStr}</div>
-            <div class="post-body">${bodyStr}</div>
-          `;
-          container.appendChild(postDiv);
+    function getFirstLine(text) {
+      if (!text) return "（本文なし）";
+      const clean = text.replace(/\[img:.*?\]/g, "").trim();
+      const lines = clean.split(/\r?\n/);
+      for (let l of lines) {
+        let line = l.trim();
+        if (line.length > 0) {
+          return line.length > 80 ? line.substring(0, 80) + "..." : line;
         }
-      },
-      error: function() {
-        document.getElementById('data-container').innerHTML = '<p style="text-align:center;">データの読み込みに失敗しました。</p>';
       }
-    });
-  </script>
-</body>
-</html>
+      return "（本文なし）";
+    }
+
+    // 記事の開閉切り替え
+    function togglePost(index) {
+      const body = document.getElementById("post-body-" + index);
+      const icon = document.getElementById("post-icon-" + index);
+      if (!body) return;
+      if (body.style.display === "none" || body.style.display === "") {
+        body.style.display = "block";
+        if (icon) icon.textContent = "▼";
+      } else {
+        body.style.display = "none";
+        if (icon) icon.textContent = "▶";
+      }
+    }
+
+    // 前後の記事へダイレクト移動
+    function goToPost(targetIndex) {
+      if (targetIndex < 0 || targetIndex >= allPosts.length) return;
+
+      const targetPage = Math.floor(targetIndex / PAGE_SIZE) + 1;
+      if (targetPage !== currentPage) {
+        renderPage(targetPage, targetIndex);
+      } else {
+        openSinglePost(targetIndex);
+      }
+    }
+
+    // 特定の記事を開いてスクロール
+    function openSinglePost(index) {
+      // 一旦他の開いている記事を閉じる
+      const openBodies = document.querySelectorAll('.blog-body-container');
+      const openIcons = document.querySelectorAll('[id^="post-icon-"]');
+      openBodies.forEach(b => b.style.display = 'none');
+      openIcons.forEach(i => i.textContent = '▶');
+
+      // 指定記事を開く
+      const body = document.getElementById("post-body-" + index);
+      const icon = document.getElementById("post-icon-" + index);
+      const itemElem = document.getElementById("post-item-" + index);
+      if (body) {
+        body.style.display = "block";
+        if (icon) icon.textContent = "▼";
+      }
+      if (itemElem) {
+        itemElem.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    // ページの描画
+    function renderPage(page, openIndexAfterRender = null) {
+      currentPage = page;
+      const container = document.getElementById("blog-container");
+      container.innerHTML = "";
+
+      const start = (page - 1) * PAGE_SIZE;
+      const end = Math.min(start + PAGE_SIZE, allPosts.length);
+      const currentPosts = allPosts.slice(start, end);
+
+      currentPosts.forEach((post, i) => {
+        const itemIdx = start + i;
+        const title = post["タイトル"] || post["title"] || "無題";
+        const date = post["日付"] || post["date"] || "";
+        const rawBody = post["本文"] || post["body"] || post["content"] || "";
+        const firstLine = getFirstLine(rawBody);
+        const fullContent = formatContent(rawBody);
+
+        // 新しい記事（itemIdx - 1）へのナビ
+        const prevHtml = itemIdx > 0
+          ? `<span class="post-nav-link" onclick="goToPost(${itemIdx - 1})">← 新しい記事へ</span>`
+          : `<span class="post-nav-disabled">← 新しい記事へ</span>`;
+
+        // 古い記事（itemIdx + 1）へのナビ
+        const nextHtml = itemIdx < allPosts.length - 1
+          ? `<span class="post-nav-link" onclick="goToPost(${itemIdx + 1})">古い記事へ →</span>`
+          : `<span class="post-nav-disabled">古い記事へ →</span>`;
+
+        const itemDiv = document.createElement("div");
+        itemDiv.className = "blog-item";
+        itemDiv.id = "post-item-" + itemIdx;
+        itemDiv.innerHTML = `
+          <div class="blog-item-header" onclick="togglePost(${itemIdx})">
+            <div class="blog-title-row">
+              <span class="blog-title"><span id="post-icon-${itemIdx}">▶</span> ${title}</span>
+              <span class="blog-date">${date}</span>
+            </div>
+            <div class="blog-summary">${firstLine}</div>
+          </div>
+          <div class="blog-body-container" id="post-body-${itemIdx}">
+            <div>${fullContent}</div>
+            
+            <!-- 前後記事ナビゲーション -->
+            <div class="post-nav-bar">
+              ${prevHtml}
+              <span class="post-nav-close" onclick="togglePost(${itemIdx})">▲ 閉じる</span>
+              ${nextHtml}
+            </div>
+          </div>
+        `;
+        container.appendChild(itemDiv);
+      });
+
+      renderPagination(start + 1, end, allPosts.length);
+
+      if (openIndexAfterRender !== null) {
+        openSinglePost(openIndexAfterRender);
+      } else {
+        window.scrollTo(0, 0);
+      }
+    }
+
+    function renderPagination(startNum, endNum, total) {
+      const nav = document.getElementById("pagination-nav");
+      const info = document.getElementById("pagination-info");
+      const btnArea = document.getElementById("pagination-buttons");
+      nav.style.display = "block";
+
+      const totalPages = Math.ceil(total / PAGE_SIZE);
+      info.textContent = `全 ${total} 件中（${startNum}〜${endNum} 件目を表示）`;
+      btnArea.innerHTML = "";
+
+      const prevBtn = document.createElement("button");
+      prevBtn.className = "page-btn";
+      prevBtn.textContent = "≪ 前の100件";
+      prevBtn.disabled = (currentPage === 1);
+      prevBtn.onclick = () => renderPage(currentPage - 1);
+      btnArea.appendChild(prevBtn);
+
+      for (let p = 1; p <= totalPages; p++) {
+        const pBtn = document.createElement("button");
+        pBtn.className = "page-btn" + (p === currentPage ? " active" : "");
+        pBtn.textContent = p;
+        pBtn.onclick = () => renderPage(p);
+        btnArea.appendChild(pBtn);
+      }
+
+      const nextBtn = document.createElement("button");
+      nextBtn.className = "page-btn";
+      nextBtn.textContent = "次の100件 ≫";
+      nextBtn.disabled = (currentPage === totalPages);
+      nextBtn.onclick = () => renderPage(currentPage + 1);
+      btnArea.appendChild(nextBtn
